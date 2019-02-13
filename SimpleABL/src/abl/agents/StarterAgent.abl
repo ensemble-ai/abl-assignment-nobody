@@ -4,14 +4,10 @@ package abl.generated;
 import abl.wmes.*;
 import abl.actions.*;
 import abl.sensors.*;
-// Imports are used the same way as in Java. Its necessary to import Sensor, Action, and WME classes.
-/** 
- * A simple agent that moves towards the player and occassionally fires bullets.
- *
- * @author Josh McCoy 1-23-2019
- * @author Ben Weber 3-7-11
- */ 
-behaving_entity ChaserAgent {
+
+
+
+behaving_entity StarterAgent {
 // This defines a name for the agent 
 
 	/** 
