@@ -158,19 +158,35 @@ public class GameEngine extends JPanel implements KeyListener {
 			g.fillRect(bullet.getX() + (playerSize - bulletSize)/2, bullet.getY() + (playerSize - bulletSize)/2, bulletSize, bulletSize);
 		}
 		
+		int id_to_delete = -1;
+		boolean flag = false;
 		// Bullet Detection
 		for(Bot b:GameEngine.getInstance().getBots()) {
 			if(b.getId() > 0) {
 				for(Bullet bu:GameEngine.getInstance().getBullets()) {
 					if ((bu.getX() - 5 < b.getX()) && (bu.getX() + 5 > b.getX()) &&
 							(bu.getY() - 5 < b.getY()) && (bu.getY() + 5 > b.getY())) {
-						GameEngine.getInstance().getBots().remove(b);
+						id_to_delete = b.getId();
+						flag = true;
+						break;
 					}
 				}
+				
+			}
+			if (flag) {
+				break;
 			}
 		}
 		
-		
+		if (flag) {
+			for(Bot b:GameEngine.getInstance().getBots()) {
+				if(b.getId() == id_to_delete) {
+					GameEngine.getInstance().getBots().remove(b);
+					break;
+				}
+			}
+		}
+
 	}
 
 	/**
