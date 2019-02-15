@@ -16,6 +16,7 @@ behaving_entity StarterAgent {
 	 * in the action's Java class.
 	 */
 	register act moveTo(int, int, int) with Move;
+	register act setColor(int,int,int,int) with SetColor;
 	register act stop(int) with Stop;
 	register act fire(int, int, int, int) with Fire;
 
@@ -85,6 +86,7 @@ behaving_entity StarterAgent {
 		specificity 2;
  
 		act moveTo(playerX, playerY, id);
+		act setColor(0, 255,255,id);
 	}
 	
 	/**
@@ -100,6 +102,7 @@ behaving_entity StarterAgent {
 		}
 		specificity 1;
 		act stop(id);
+		act setColor(0,255,0,id);
 	}
 
     /**
