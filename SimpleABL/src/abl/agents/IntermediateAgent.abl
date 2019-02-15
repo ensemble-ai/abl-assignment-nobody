@@ -1,0 +1,304 @@
+package abl.generated;
+// the package corresponds to where generated Java files are placed.
+
+import abl.wmes.*;
+import abl.actions.*;
+import abl.sensors.*;
+ 
+behaving_entity IntermediateAgent {
+// This defines a name for the agent 
+
+	/** 
+	 * Define the physicals actions that the agent can perform. The definition includes an action prototype and
+	 * and an action class name. The class name must be a Java class which has been imported. 
+	 *
+	 * The prototype parameters correspond to the types expected by the execute(object[]) method 
+	 * in the action's Java class.
+	 */
+	register act moveTo(int, int, int, int) with MoveWithSpeed;
+	register act bulletDetect() with BulletDetection;
+	register act transport(int, int, int) with Transport;
+	register act createBot(int, int) with CreateBot;
+	register act setColor(int,int,int,int) with SetColor;
+	register act stop(int) with Stop;
+	register act fire(int, int, int, int) with Fire;
+
+	/**
+	 * Define the sensors that add game state to working memory. Each sensor defines the name of the WME class
+	 * that it is responsible for managing and the Java sensor class that implements the functionality. 
+	 */
+    register wme PlayerWME with PlayerSensor;
+    register wme BotWME with BotSensor;
+
+	/**
+	 * Defines a variable scope to the agent, which can be used and modified in behaviors. 
+	 *
+	 * It is also possible to use constants from a Java interface (e.g.):
+     * constants game.Constants;   
+	 */ 
+	int botSpeed = 2;
+	/**
+	 * After an initial delay, continuously fire bullets. 
+	 */
+	sequential behavior manageFiring() {
+		subgoal Wait(2000);					// this suspends the execution of the behavior
+		with (persistent) subgoal fire();
+	}
+
+
+    /**
+     * Fires a bullet at the player character using the bot position at the source and the player position as the target
+     *
+     * Each fire action is followed by a cooldown period. 
+     */
+	sequential behavior fire() {
+		precondition {
+			(PlayerWME locationX::playerX locationY::playerY)	// locationX invokes PlayerMWE.getLocationX() 
+			(BotWME locationX::botX locationY::botY)   // :: is used to bind properties to behavior scoped variables
+		}
+
+		act fire(botX, botY, playerX, playerY);
+		subgoal Wait(500);
+	}
+
+	/**
+	 * Continuously move towards the player character.
+	 */
+	sequential behavior manageMovement() {
+		with (persistent) subgoal move();
+	}
+
+
+	sequential behavior move() {
+		precondition {
+			(PlayerWME locationY::playerY locationX::playerX)
+			(BotWME id::id locationX::botX locationY::botY)
+			(id == 1)
+		}
+		specificity 2;
+		int posX = 0;
+		int posY = 0;
+
+		mental_act {
+			posX = playerX + 16;
+			posY = playerY + 16;
+		}
+ 
+		act transport(posX, posY, 1);
+	}
+
+	sequential behavior move() {
+		precondition {
+			(PlayerWME locationY::playerY locationX::playerX)
+			(BotWME id::id locationX::botX locationY::botY)
+			(botX != (playerX + 16) || botY != (playerY - 16))
+			(id == 2)
+		}
+		specificity 2;
+
+		int posX = 0;
+		int posY = 0;
+
+		mental_act {
+			posX = playerX + 16;
+			posY = playerY - 16;
+		}
+ 
+		act transport(posX, posY, 2);
+	}
+
+	sequential behavior move() {
+		precondition {
+			(PlayerWME locationY::playerY locationX::playerX)
+			(BotWME id::id locationX::botX locationY::botY)
+			(botX != (playerX - 16) || botY != (playerY + 16))
+			(id == 3)
+		}
+		specificity 2;
+		
+		int posX = 0;
+		int posY = 0;
+
+		mental_act {
+			posX = playerX - 16;
+			posY = playerY + 16;
+		}
+ 
+		act transport(posX, posY, 3);
+	}
+
+	sequential behavior move() {
+		precondition {
+			(PlayerWME locationY::playerY locationX::playerX)
+			(BotWME id::id locationX::botX locationY::botY)
+			(botX != (playerX - 16) || botY != (playerY - 16))
+			(id == 4)
+		}
+		specificity 2;
+		
+		int posX = 0;
+		int posY = 0;
+
+		mental_act {
+			posX = playerX - 16;
+			posY = playerY - 16;
+		}
+ 
+		act transport(posX, posY, 4);
+	}
+
+	sequential behavior move() {
+		precondition {
+			(BotWME id::id)
+			(id > 0)
+		}
+
+		specificity 1;
+		act stop(id);
+	}
+	
+	sequential behavior move() {
+		precondition {
+			(PlayerWME locationY::playerY locationX::playerX)
+			(BotWME id::id locationX::botX locationY::botY)
+			(id == 0)
+			(botX < (playerX + 5) && botX > (playerX - 5))
+			(botY < (playerY + 5) && botY > (playerY - 5))
+		}
+		specificity 2;
+ 
+		act stop(id);
+		act setColor(0, 255, 0, id);
+	}	
+
+    // Bot 0 Movement
+	sequential behavior move() {
+		precondition {
+			(PlayerWME locationY::playerY locationX::playerX)
+			(BotWME id::id locationX::botX locationY::botY)
+			(id == 0)
+			(botY != playerY || botX != playerX)
+		}
+		specificity 2;
+ 
+		act moveTo(playerX, playerY, id, 2);
+		act setColor(255, 0, 0, id);
+	}
+
+	sequential behavior move() {
+		precondition {
+			(BotWME id::id)
+			(id == 0)
+		}
+
+		specificity 1;
+		act stop(id);
+		act setColor(0, 255, 0, id);
+	}
+
+
+	sequential behavior initialize() {
+		precondition {
+			(PlayerWME locationX::playerX locationY::playerY)	// locationX invokes PlayerMWE.getLocationX()
+			(BotWME id::id)
+		}
+		specificity 2;
+
+		int botOneX = 0;
+		int botOneY = 0;
+		int botTwoX = 0;
+		int botTwoY = 0;
+		int botThreeX = 0;
+		int botThreeY = 0;
+		int botFourX = 0;
+		int botFourY = 0;
+
+		mental_act {
+			botOneX = playerX + 16;
+			botOneY = playerY + 16;
+			botTwoX = playerX + 16;
+			botTwoY = playerY - 16;
+			botThreeX = playerX - 16;
+			botThreeY = playerY + 16;
+			botFourX = playerX - 16;
+			botFourY = playerY - 16;
+		}
+
+		act createBot(botOneX, botOneY);
+		act createBot(botTwoX, botTwoY);
+		act createBot(botThreeX, botThreeY);
+		act createBot(botFourX, botFourY);
+
+		// mental_act {
+		// 	TargetWME targetWME1 = new TargetWME();
+		// 	targetWME1.setPosX(botOneX);
+		// 	targetWME1.setPosY(botOneY);
+		// 	targetWME1.setBotId(1);
+		// 	BehavingEntity.getBehavingEntity().addWME(targetWME1);
+
+		// 	TargetWME targetWME2 = new TargetWME();
+		// 	targetWME2.setPosX(botTwoX);
+		// 	targetWME2.setPosY(botTwoY);
+		// 	targetWME2.setBotId(2);
+		// 	BehavingEntity.getBehavingEntity().addWME(targetWME2);
+
+		// 	TargetWME targetWME3 = new TargetWME();
+		// 	targetWME3.setPosX(botThreeX);
+		// 	targetWME3.setPosY(botThreeY);
+		// 	targetWME3.setBotId(3);
+		// 	BehavingEntity.getBehavingEntity().addWME(targetWME3);
+
+		// 	TargetWME targetWME4 = new TargetWME();
+		// 	targetWME4.setPosX(botFourX);
+		// 	targetWME4.setPosY(botFourY);
+		// 	targetWME4.setBotId(4);
+		// 	BehavingEntity.getBehavingEntity().addWME(targetWME4);
+		// }
+
+		succeed_step;
+	}
+
+	// sequential behavior initialize() {
+	// 	precondition {
+	// 		(PlayerWME locationX::playerX locationY::playerY)	// locationX invokes PlayerMWE.getLocationX()
+	// 		(BotWME id::id)
+	// 		!(TargetWME botId==id)
+	// 	}
+	// 	specificity 1;
+	// 	succeed_step;
+	// }
+	
+    /**
+     * Utility behavior for suspending the execution of a behavior.
+     *
+     * This behavior consist of two steps. First, the mental act compute the finishing time
+     * based on the input delay. Second, the success tests waits until the condition check
+     * evaluates to true.
+     */
+	sequential behavior Wait(int milliseconds) {
+		long finish;
+	    mental_act { 
+	    	finish = System.currentTimeMillis() + milliseconds;
+	    }
+	    
+	    with ( success_test { (System.currentTimeMillis() > finish) } ) wait;
+	}
+ 
+    /** 
+     * Root of the active behavior tree.
+     *
+     * Note: this is a parallel behavior.
+     * Note: the ABL compiler expects this to be the last behavior defined in the agent. 
+     * Note: prioirities are used to ensure all goals are pursued, since the move() goal can thrash in this simple example
+     */
+    initial_tree {
+    	with (priority 10) mental_act {
+			System.out.println("Starting new bot Agent");
+    	}
+
+		with (priority 9, persistent when_fails) subgoal initialize();
+		// with (priority 4) subgoal manageCreation();
+    	with (priority 2) subgoal manageFiring();
+    	with (priority 1) subgoal manageMovement();
+    }
+}

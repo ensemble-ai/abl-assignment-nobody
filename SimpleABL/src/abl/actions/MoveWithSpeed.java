@@ -5,7 +5,7 @@ import game.GameEngine;
 import java.awt.Point;
 
 
-public class Move extends BaseAction {
+public class MoveWithSpeed extends BaseAction {
 
 	/**
 	 * Sets the trajectory of the player to move down.
@@ -18,8 +18,8 @@ public class Move extends BaseAction {
 				int y = (Integer)args[1] - b.getY();
 				
 				double s = Math.sqrt(x * x + y * y);
-				int x_speed = (int) (GameEngine.BotSpeed * x / s);
-				int y_speed = (int) (GameEngine.BotSpeed  * y / s);
+				int x_speed = (int) ((Integer)args[3] * x / s);
+				int y_speed = (int) ((Integer)args[3] * y / s);
 				
 				b.setTrajectory(new Point(x_speed, y_speed));
 			}

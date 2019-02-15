@@ -2,6 +2,7 @@ package abl.wmes;
 
 import java.awt.Point;
 
+import game.GameEngine;
 import wm.WME;
 /**
  * Stores information about the player character.
@@ -55,5 +56,9 @@ public class PlayerWME extends WME {
 	 */
 	public int getTrajectoryY() {
 		return trajactory.y;
+	}
+	
+	public int getNumBots() {
+		return GameEngine.getInstance().getBots().size();
 	}
 }

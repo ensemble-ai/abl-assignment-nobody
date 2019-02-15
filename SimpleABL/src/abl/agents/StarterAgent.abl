@@ -6,8 +6,7 @@ import abl.actions.*;
 import abl.sensors.*;
  
 behaving_entity StarterAgent {
-// This defines a name for the agent 
-
+// This defines a name for the agent
 	/** 
 	 * Define the physicals actions that the agent can perform. The definition includes an action prototype and
 	 * and an action class name. The class name must be a Java class which has been imported. 

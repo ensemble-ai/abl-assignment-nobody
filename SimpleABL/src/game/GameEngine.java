@@ -39,7 +39,7 @@ public class GameEngine extends JPanel implements KeyListener {
 	private Point chaserTrajectory = new Point(0, 0);
 
 	/** size of the player character */
-	private static final int playerSize = 10;
+	private static final int playerSize = 8;
 
 	/** size of the bullets */
 	private static final int bulletSize = 4;
@@ -130,7 +130,8 @@ public class GameEngine extends JPanel implements KeyListener {
 	 * Note: this method does not return, the ABL agent decision cycle claims the thread.
 	 */
 	public void startAgent() {
-		 StarterAgent agent = new StarterAgent();
+		 //StarterAgent agent = new StarterAgent();
+		 IntermediateAgent agent = new IntermediateAgent();
 		 agent.startBehaving();
 	}
 
@@ -138,6 +139,7 @@ public class GameEngine extends JPanel implements KeyListener {
 	 * Updates the positions of objects, and draws the scene.
 	 */
 	public void paint(Graphics g) {
+				
 		updateLocations();
 		updateBullets();
 	
@@ -155,6 +157,20 @@ public class GameEngine extends JPanel implements KeyListener {
 		for (Bullet bullet : bullets) {
 			g.fillRect(bullet.getX() + (playerSize - bulletSize)/2, bullet.getY() + (playerSize - bulletSize)/2, bulletSize, bulletSize);
 		}
+		
+		// Bullet Detection
+		for(Bot b:GameEngine.getInstance().getBots()) {
+			if(b.getId() > 0) {
+				for(Bullet bu:GameEngine.getInstance().getBullets()) {
+					if ((bu.getX() - 5 < b.getX()) && (bu.getX() + 5 > b.getX()) &&
+							(bu.getY() - 5 < b.getY()) && (bu.getY() + 5 > b.getY())) {
+						GameEngine.getInstance().getBots().remove(b);
+					}
+				}
+			}
+		}
+		
+		
 	}
 
 	/**
@@ -169,6 +185,7 @@ public class GameEngine extends JPanel implements KeyListener {
 
 		// check for out of boundary bullets
 		ArrayList<Bullet> remove = new ArrayList<Bullet>();
+		
 		for (Bullet bullet : bullets) {
 			if (bullet.x < 0) {
 				remove.add(bullet);
@@ -305,6 +322,10 @@ public class GameEngine extends JPanel implements KeyListener {
 	
 	public ArrayList<Bot> getBots() {
 		return bots;
+	}
+	
+	public ArrayList<Bullet> getBullets() {
+		return bullets;
 	}
 	
 	/**
