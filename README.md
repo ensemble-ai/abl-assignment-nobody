@@ -15,7 +15,7 @@ Starter Tasks
 * Add a SetColor action that takes (int r, int b, int g, int id).
 * Add color sensing to the BotWME (this includes changes to BotSensor.java and BotWME.java).
 
-Color is changed when the bot is at the position of the player.
+ ### Color is changed when the bot is at the position of the player.
 
 
 Intermediate Tasks
