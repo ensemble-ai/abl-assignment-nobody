@@ -1,0 +1,283 @@
+package abl.generated;
+// the package corresponds to where generated Java files are placed.
+
+import abl.wmes.*;
+import abl.actions.*;
+import abl.sensors.*;
+// Imports are used the same way as in Java. Its necessary to import Sensor, Action, and WME classes.
+
+behaving_entity AdvancedAgent {
+
+	register act fire(int, int, int, int) with Fire;
+	register act createBot0(int,int,int) with CreateBot0;
+	register act welcome(int,int) with Welcome;
+	register act surround(int,int) with Surround;
+	register act runaway(int,int) with RunAway;
+	register act fightback(int,int) with FightBack;
+	register act suicide(int,int) with Suicide;
+	
+	register wme PlayerWME with PlayerSensor;
+	register wme BotWME with BotSensor;
+	
+	wme FormWME {
+		int botNum;
+		int friend;
+	}
+	
+	wme AmmoWME {
+		int count;
+		int botId;
+	}
+	
+
+	/********************
+	** 10: Initialize
+	********************/
+	int MAX_AMMO = 10;	
+	sequential behavior initializeBots() {
+		precondition {
+			(BotWME id::id)
+			!(AmmoWME botId==id)
+		}
+		specificity 2;
+		mental_act{
+			AmmoWME ammoWME = new AmmoWME();
+			ammoWME.setCount(MAX_AMMO);
+			ammoWME.setBotId(id);
+			BehavingEntity.getBehavingEntity().addWME(ammoWME);
+		}
+		subgoal initializeBots();
+	}
+
+	sequential behavior initializeBots() {
+		precondition {
+			(BotWME id::id)
+			!(AmmoWME botId!=id)
+		}
+		specificity 1;
+		succeed_step;
+	}
+	
+	/********************
+	** 9: Create MAX_AMMO Bot
+	********************/
+	
+	sequential behavior createBots() {
+		precondition {
+			(BotWME id::id locationX::botX locationY::botY)
+			(PlayerWME locationX::PlayerX locationY::PlayerY)
+			ammoWME = (AmmoWME botId==id count>0 count::count)
+		}
+		specificity 1;
+		act createBot0(PlayerX,PlayerY,id);
+		mental_act {
+			ammoWME.setCount(count - 1); 
+		}
+		subgoal Wait(400);
+		fail_step;
+	}
+	
+	sequential behavior createBots() {
+		precondition {
+			(BotWME id::id locationX::botX locationY::botY)
+			ammoWME = (AmmoWME botId==id count==0 count::count)
+		}
+		specificity 1;
+		succeed_step;
+	}	
+	
+	sequential behavior Wait(int milliseconds) {
+	    long finish;
+	    mental_act { 
+	    	finish = System.currentTimeMillis() + milliseconds; 
+	    }
+	    with ( success_test { (System.currentTimeMillis() > finish) } ) wait;
+	}
+
+	/********************
+	** 8: Set WMEs for Bots
+	********************/
+	
+	sequential behavior setBotsWme() {
+		precondition {
+			(BotWME id>0 id::id)
+			!(FormWME)
+		}
+		specificity 2;
+		mental_act{
+			FormWME formWME = new FormWME();
+			formWME.setBotNum(MAX_AMMO + 1);	
+			formWME.setFriend(20);
+				
+			BehavingEntity.getBehavingEntity().addWME(formWME);
+		}
+		subgoal checkForm();
+	}
+		
+	sequential behavior checkForm() {
+		precondition {
+			(BotWME id>0 id::id)
+			(FormWME)
+		}
+		specificity 1;
+		succeed_step;
+	}
+	
+	/********************
+	** 2: Manage Kill
+	********************/
+	
+	sequential behavior manageKill() {
+		precondition {
+			(FormWME botNum>0 botNum::num friend::fd)
+		}
+		
+		subgoal Wait(5000);	
+		with (persistent when_fails) subgoal countKill();
+		
+	}
+	
+	sequential behavior countKill() {
+		precondition {
+			(PlayerWME locationX::playerX locationY::playerY numBots::newNum)	// locationX invokes PlayerMWE.getLocationX() 
+			(BotWME locationX::botX locationY::botY)   // :: is used to bind properties to behavior scoped variables
+			formWME = (FormWME botNum>0 botNum::num friend::fd)
+		}
+		specificity 2;
+		
+		mental_act{
+			if ( newNum < num ) {
+				formWME.setFriend( fd - (num - newNum) * 5 );
+				formWME.setBotNum(newNum);
+			}
+			else {
+				formWME.setFriend(fd + 1);
+			}
+		}
+		subgoal Wait(5000);
+		fail_step;
+	}
+	
+	sequential behavior countKill() {
+		precondition {
+			(PlayerWME locationX::playerX locationY::playerY)	// locationX invokes PlayerMWE.getLocationX() 
+			(BotWME locationX::botX locationY::botY)   // :: is used to bind properties to behavior scoped variables
+			formWME = (FormWME botNum<1 botNum::num friend::fd)
+		}
+		specificity 1;
+				
+		succeed_step;
+	}
+	
+	/********************
+	** 1: Manage the Move
+	********************/
+	
+	sequential behavior manageBots() {
+		precondition {
+			(FormWME botNum>=0)
+		}
+		
+		subgoal Wait(3000);	
+		with (persistent) subgoal decide();
+	}
+	
+	sequential behavior decide() {
+		precondition{
+			(PlayerWME locationX::playerX locationY::playerY)
+			(FormWME botNum>7 botNum::num friend>30 friend::fd)
+		}
+		specificity 5;
+		
+		act surround( playerX, playerY );
+	}
+	
+	sequential behavior decide() {
+		precondition{
+			(PlayerWME locationX::playerX locationY::playerY)
+			(FormWME botNum>9 botNum::num friend>19 friend::fd)
+		}
+		specificity 4;
+		
+		act welcome( playerX, playerY );
+	}
+	
+	sequential behavior decide() {
+		precondition{
+			(PlayerWME locationX::playerX locationY::playerY)
+			(FormWME botNum>5 botNum::num friend>13 friend::fd)
+		}
+		specificity 3;
+		
+		act runaway( playerX, playerY );
+	}
+	
+	sequential behavior decide() {
+		precondition{
+			(PlayerWME locationX::playerX locationY::playerY)
+			(FormWME botNum>1 botNum::num friend<18 friend::fd)
+		}
+		specificity 2;
+		
+		act fightback( playerX, playerY );
+		act runaway( playerX, playerY );
+		subgoal Wait(300);	
+	}
+	
+	sequential behavior decide() {
+		precondition{
+			(PlayerWME locationX::playerX locationY::playerY)
+			(FormWME botNum>1 botNum::num friend>17 friend::fd)
+		}
+		specificity 2;
+		
+		act runaway( playerX, playerY );
+	}
+	
+	sequential behavior decide() {
+		precondition{
+			(PlayerWME locationX::playerX locationY::playerY)
+			(FormWME botNum==1 botNum::num friend>40 friend::fd)
+		}
+		specificity 2;
+		
+		act surround( playerX, playerY );
+	}
+	
+	sequential behavior decide() {
+		precondition{
+			(PlayerWME locationX::playerX locationY::playerY)
+			(FormWME botNum==1 botNum::num friend<20 friend::fd)
+		}
+		specificity 1;
+		
+		act suicide( playerX, playerY );
+	}
+	
+	sequential behavior decide() {
+		precondition{
+			(PlayerWME locationX::playerX locationY::playerY)
+			(FormWME botNum==1 botNum::num friend>19 friend::fd)
+		}
+		specificity 1;
+		
+		act runaway( playerX, playerY );
+	}
+		
+	
+	/********************
+	** INITIAL TREE
+	********************/
+
+	initial_tree {
+		with (priority 11) mental_act {
+			System.out.println("The Test agent has started on initial_tree.");
+		}
+		with (priority 10, persistent when_fails) subgoal initializeBots();
+		with (priority 9, persistent when_fails) subgoal createBots();
+		with (priority 8, persistent when_fails) subgoal setBotsWme();
+		with (priority 2) subgoal manageKill();
+		with (priority 1, persistent) subgoal manageBots();
+	}
+	
+}

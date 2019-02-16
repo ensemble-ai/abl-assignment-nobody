@@ -24,10 +24,12 @@ public class AgentCompiler {
 		if (debugMode) {
 			Abl.main(new String[] { "-g2", "-d", "src", "src/abl/agents/StarterAgent.abl" });
 			Abl.main(new String[] { "-g2", "-d", "src", "src/abl/agents/IntermediateAgent.abl" });
+			Abl.main(new String[] { "-g2", "-d", "src", "src/abl/agents/AdvancedAgent.abl" });
 		}
 		else {
 			Abl.main(new String[] { "-d", "src", "src/abl/agents/StarterAgent.abl" });
-			Abl.main(new String[] { "-g2", "-d", "src", "src/abl/agents/IntermediateAgent.abl" });
+			Abl.main(new String[] { "-d", "src", "src/abl/agents/IntermediateAgent.abl" });
+			Abl.main(new String[] { "-d", "src", "src/abl/agents/AdvancedAgent.abl" });
 		}
 	}
 }

@@ -131,7 +131,8 @@ public class GameEngine extends JPanel implements KeyListener {
 	 */
 	public void startAgent() {
 		 //StarterAgent agent = new StarterAgent();
-		 IntermediateAgent agent = new IntermediateAgent();
+		 //IntermediateAgent agent = new IntermediateAgent();
+		AdvancedAgent agent = new AdvancedAgent();
 		 agent.startBehaving();
 	}
 
@@ -161,8 +162,9 @@ public class GameEngine extends JPanel implements KeyListener {
 		int id_to_delete = -1;
 		boolean flag = false;
 		// Bullet Detection
+		if (GameEngine.getInstance().getBots() != null) {
 		for(Bot b:GameEngine.getInstance().getBots()) {
-			if(b.getId() > 0) {
+			if(b.getId() >= 0) {
 				for(Bullet bu:GameEngine.getInstance().getBullets()) {
 					if ((bu.getX() - 5 < b.getX()) && (bu.getX() + 5 > b.getX()) &&
 							(bu.getY() - 5 < b.getY()) && (bu.getY() + 5 > b.getY())) {
@@ -186,7 +188,7 @@ public class GameEngine extends JPanel implements KeyListener {
 				}
 			}
 		}
-
+		}
 	}
 
 	/**
