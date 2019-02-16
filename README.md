@@ -34,9 +34,13 @@ The player can use "Space" to shoot, and when a bullet hit the Bot, it will die 
 We are trying to make such a scene: "An soldier arrived at an unfamiliar village".
 
 Those Bots will started to act 5 seconds after the ABL launched, and their behavior is controlled by the **FormWME**, which contains 2 variables :
+
 **BotNum**: record the number of remained Bots;
+
 **Friend**: the relationship between Bots & Player.
+
 Both of them are updated every 5 seconds.
+
 
 At first, those Bots well come and stand in a line beside the player as **welcome**.
 If the player show friendly to them (don't kill), the "Friend" variable will increase as time goes. When it grows to a specific value ( about 1 min later ), the bots will **surround** the player to show their respect.
