@@ -4,8 +4,8 @@ ABL-Assignment
 
 ## Report
 
-We have three agents: StarterAgent, IntermediateAgent, and AdvancedAgent.
-Please specify the agent used in GameEngine.
+We have three agents: **StarterAgent**, **IntermediateAgent**, and **AdvancedAgent**.
+Please specify the agent used in **GameEngine**.
 
 
 Starter Tasks
